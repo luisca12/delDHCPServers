@@ -34,24 +34,29 @@ def delDHCPSevers(validIPs, username, netDevice):
                 'session_log_file_mode': 'append'
             }
 
-            sshAccess.enable()
-            showIntVlanOut = sshAccess.send_command(showIntVlan)
-            authLog.info(f"User {username} connected to {validDeviceIP} ran the command '{showIntVlan}'")
-            showIntVlanOut = showIntVlanOut.replace('ip helper-address 10.155.23.120','no ip helper-address 10.155.23.120')
-
             print(f"INFO: Connecting to device {validDeviceIP}...")
+            authLog.info(f"User {username} is now running commands at: {validDeviceIP}")
             with ConnectHandler(**currentNetDevice) as sshAccess:
-                authLog.info(f"User {username} is now running commands at: {validDeviceIP}")
                 sshAccess.enable()
+                showIntVlanOut = sshAccess.send_command(showIntVlan)
+                authLog.info(f"User {username} connected to {validDeviceIP} ran the command '{showIntVlan}'")
+                print(showIntVlanOut)
+                os.system("PAUSE")
+                showIntVlanOut = showIntVlanOut.replace('ip helper-address 192.168.0.1','no ip helper-address 192.168.0.1')
+                authLog.info(f"Automation removed the ip helpers in device{validDeviceIP}: ")
+                print(showIntVlanOut)
+                os.system("PAUSE")
+
                 shHostnameOut = sshAccess.send_command(shHostname)
                 authLog.info(f"User {username} successfully found the hostname {shHostnameOut}")
                 shHostnameOut = shHostnameOut.replace('hostname ', '')
                 shHostnameOut = shHostnameOut.strip()
                 shHostnameOut = shHostnameOut + "#"
 
-                print(f"INFO: Configuring the following commands in {validDeviceIP}: {delDHCPList[1]}\n")
-                authLog.info(f"Configuring the following commands in {validDeviceIP}: {delDHCPList[1]}\n")
-                showDelDHCP = sshAccess.send_command(showIntVlanOut)
+                print(f"INFO: Configuring the following commands in {validDeviceIP}: {delDHCPList[0]}")
+                authLog.info(f"Configuring the following commands in {validDeviceIP}: {delDHCPList[0]}")
+                showIntVlanOut = showIntVlanOut.split('\n')
+                showDelDHCP = sshAccess.send_config_set(showIntVlanOut)
                 print(showDelDHCP)
                 os.system("PAUSE")
                 print(f"INFO: Successfully removed unnecessary DHCP servers for device: {validDeviceIP}")

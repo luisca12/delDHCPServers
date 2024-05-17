@@ -1,11 +1,11 @@
 import os
-from commandsCLI import addAutoRecov
+from commandsCLI import delDHCPList
 
 def greetingString():
         os.system("CLS")
-        print('  ----------------------------------------------------- ')
-        print("    Welcome to the automated add Auto Recovery Program ")
-        print('  ----------------------------------------------------- ')
+        print('  ------------------------------------------------------- ')
+        print("    Welcome to the automated remove DHCP Servers Program ")
+        print('  ------------------------------------------------------- ')
 
 def menuString(deviceIP, username):
         os.system("CLS")
@@ -15,7 +15,7 @@ def menuString(deviceIP, username):
         print('\t\t  Only numbers are accepted')
         print('  -------------------------------------------------------------- ')
         print('  >\t\t1. To run the following commands:\t       <')
-        print(f'\t\t{addAutoRecov[0]}\n\t\t{addAutoRecov[1]}\n')      
+        print(f'\t\t{delDHCPList[0]}\n')      
         print('  >\t\t\t2. Exit the program\t\t       <')
         print('  -------------------------------------------------------------- \n')
 

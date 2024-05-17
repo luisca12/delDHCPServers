@@ -1,7 +1,7 @@
 from auth import *
 from strings import *
 from functions import *
-from commandsCLI import addRecov
+from commandsCLI import delDHCPSevers
 from log import *
 import os
 
@@ -14,8 +14,8 @@ def main():
         selection = input("Please choose the option that yyou want: ")
         if checkIsDigit(selection):
             if selection == "1":
-                # This option will add auto recovery
-                addRecov(validIPs, username, netDevice)
+                # This option will remove DHCP Servers
+                delDHCPSevers(validIPs, username, netDevice)
             if selection == "2":
                 authLog.info(f"User {username} disconnected from the devices {validIPs}")
                 authLog.info(f"User {username} logged out from the program.")
