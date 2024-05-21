@@ -12,8 +12,20 @@ shHostname = "show run | i hostname"
 showIntVlan = "show run | sec interface Vlan"
 
 delDHCPList = [
-    'no ip helper-address 10.0.0.0'
+    '10.155.23.120',
+    '30.230.62.110',
+    '30.232.62.126',
+    '30.132.252.110'
 ]
+
+delDHCPCommands = {
+    f'ip helper-address {delDHCPList[0]}':f'no ip helper-address {delDHCPList[0]}',
+    f'ip helper-address {delDHCPList[1]}':f'no ip helper-address {delDHCPList[1]}',
+    f'ip helper-address {delDHCPList[2]}':f'no ip helper-address {delDHCPList[2]}',
+    f'ip helper-address {delDHCPList[3]}':f'no ip helper-address {delDHCPList[3]}'
+}
+
+commandList = '\n'.join(list(delDHCPCommands.values()))
 
 def delDHCPSevers(validIPs, username, netDevice):
     # This function is to add Auto Recovery
@@ -39,35 +51,37 @@ def delDHCPSevers(validIPs, username, netDevice):
             with ConnectHandler(**currentNetDevice) as sshAccess:
                 sshAccess.enable()
                 showIntVlanOut = sshAccess.send_command(showIntVlan)
+                oldConfig = showIntVlanOut
                 authLog.info(f"User {username} connected to {validDeviceIP} ran the command '{showIntVlan}'")
-                print(showIntVlanOut)
-                os.system("PAUSE")
-                showIntVlanOut = showIntVlanOut.replace('ip helper-address 192.168.0.1','no ip helper-address 192.168.0.1')
-                authLog.info(f"Automation removed the ip helpers in device{validDeviceIP}: ")
-                print(showIntVlanOut)
-                os.system("PAUSE")
-
                 shHostnameOut = sshAccess.send_command(shHostname)
                 authLog.info(f"User {username} successfully found the hostname {shHostnameOut}")
                 shHostnameOut = shHostnameOut.replace('hostname ', '')
                 shHostnameOut = shHostnameOut.strip()
                 shHostnameOut = shHostnameOut + "#"
 
-                print(f"INFO: Configuring the following commands in {validDeviceIP}: {delDHCPList[0]}")
-                authLog.info(f"Configuring the following commands in {validDeviceIP}: {delDHCPList[0]}")
+                print(f"INFO: Configuring the following commands in {validDeviceIP}\n{commandList}")
+                showIntVlanOut = showIntVlanOut.replace(list(delDHCPCommands.keys())[0], list(delDHCPCommands.values())[0])
+                showIntVlanOut = showIntVlanOut.replace(list(delDHCPCommands.keys())[1], list(delDHCPCommands.values())[1])
+                showIntVlanOut = showIntVlanOut.replace(list(delDHCPCommands.keys())[2], list(delDHCPCommands.values())[2])
+                showIntVlanOut = showIntVlanOut.replace(list(delDHCPCommands.keys())[3], list(delDHCPCommands.values())[3])
+                authLog.info(f"Automation removed the ip helpers {delDHCPList[0]}, {delDHCPList[1]}, {delDHCPList[2]}, and {delDHCPList[3]} in device {validDeviceIP}: ")
+
                 showIntVlanOut = showIntVlanOut.split('\n')
                 showDelDHCP = sshAccess.send_config_set(showIntVlanOut)
-                print(showDelDHCP)
-                os.system("PAUSE")
                 print(f"INFO: Successfully removed unnecessary DHCP servers for device: {validDeviceIP}")
                 authLog.info(f"Successfully removed unnecessary DHCP servers for device: {validDeviceIP}")
+                authLog.info(f"The following configuration was sent to the device: {validDeviceIP}\n{showDelDHCP}")
 
                 with open(f"{validDeviceIP}_Outputs.txt", "a") as file:
                     file.write(f"User {username} connected to device IP {validDeviceIP}\n\n")
-                    print(f"INFO: Validating the configuration done...\n{shHostnameOut}{showIntVlan}")
-                    showIntVlanOut = sshAccess.send_command(showIntVlan)
-                    authLog.info(f"Automation successfully ran the command: {showIntVlan}")
-                    file.write(f"{shHostnameOut}{showIntVlan}:\n{showIntVlanOut}")
+                    file.write(f"INFO: Old/Current configuration:\n{shHostnameOut}{showIntVlan}\n{oldConfig}\n")
+                    print(f"INFO: Validating the new configuration done...\n{shHostnameOut}{showIntVlan}")
+                    showIntVlanOut1 = sshAccess.send_command(showIntVlan)
+                    print(showIntVlanOut1)
+                    authLog.info(f"Automation successfully ran the command: \"{showIntVlan}\" to validate the new configuration:\n\
+                    {shHostnameOut}{showIntVlan}:\n{showIntVlanOut1}")
+                    file.write("\nINFO: Validating the new configuration:\n")
+                    file.write(f"{shHostnameOut}{showIntVlan}:\n{showIntVlanOut1}")
 
         except Exception as error:
             print(f"An error occurred: {error}\n", traceback.format_exc())
@@ -79,6 +93,6 @@ def delDHCPSevers(validIPs, username, netDevice):
         finally:
             with open(f"generalOutputs.txt", "a") as file:
                     file.write(f"INFO: Taking a \"{showIntVlan}\" for device: {validDeviceIP}\n")
-                    file.write(f"{shHostnameOut}{showIntVlan}:\n{showIntVlanOut}\n")
+                    file.write(f"{shHostnameOut}{showIntVlan}:\n{showIntVlanOut1}\n")
             print("\nOutputs and files successfully created.")
             print("For any erros or logs please check authLog.txt\n")

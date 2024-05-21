@@ -4,11 +4,9 @@ from functions import checkYNInput,validateIP,requestLogin,checkReachPort22
 from strings import greetingString
 from log import *
 from log import invalidIPLog
-import socket
 import traceback
 import csv
 import os
-import logging
 
 username = ""
 execPrivPassword = ""

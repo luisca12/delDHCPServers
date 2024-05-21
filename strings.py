@@ -1,5 +1,5 @@
 import os
-from commandsCLI import delDHCPList
+from commandsCLI import commandList
 
 def greetingString():
         os.system("CLS")
@@ -15,8 +15,8 @@ def menuString(deviceIP, username):
         print('\t\t  Only numbers are accepted')
         print('  -------------------------------------------------------------- ')
         print('  >\t\t1. To run the following commands:\t       <')
-        print(f'\t\t{delDHCPList[0]}\n')      
-        print('  >\t\t\t2. Exit the program\t\t       <')
+        print(f'{commandList}')      
+        print('  \n>\t\t\t2. Exit the program\t\t       <')
         print('  -------------------------------------------------------------- \n')
 
 def inputErrorString():
